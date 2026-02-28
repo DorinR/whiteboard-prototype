@@ -6,25 +6,53 @@ export const Note = () => {
   const [xPosition, setXposition] = useState<number>(500);
   const [yPosition, setYPosition] = useState<number>(100);
 
-  const dragRef = useRef<{ noteId: string; x: number; y: number }>(null);
+  const dragRef = useRef<{ noteId: string; xOffset: number; yOffset: number }>(
+    null,
+  );
+
+  // for storing id of requestAnimationFrame - so we can cancel scheduled update on unmount.
+  const rafRef = useRef<number | null>(null);
+
+  const updateNotePosition = ({
+    clientX,
+    clientY,
+  }: {
+    clientX: number;
+    clientY: number;
+  }) => {
+    const drag = dragRef.current;
+    if (!drag) return;
+
+    const newX = clientX + drag.xOffset;
+    const newY = clientY + drag.yOffset;
+
+    setXposition(newX);
+    setYPosition(newY);
+  };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
 
+    // store which note was grabbed, and from where (offset)
     dragRef.current = {
       noteId,
-      x: e.clientX,
-      y: e.clientY,
+      xOffset: xPosition - e.clientX,
+      yOffset: yPosition - e.clientY,
     };
   };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       e.preventDefault();
-      if (dragRef.current === null) return;
+      const drag = dragRef.current;
+      if (!drag) return;
 
-      setXposition(e.clientX);
-      setYPosition(e.clientY);
+      if (rafRef.current !== null) return;
+
+      rafRef.current = requestAnimationFrame(() => {
+        updateNotePosition({ clientX: e.clientX, clientY: e.clientY });
+        rafRef.current = null; // scheduled update complete
+      });
     };
 
     const handleMouseUp = () => {
@@ -40,9 +68,18 @@ export const Note = () => {
     };
   }, []);
 
+  // cancel scheduled note position update if component is unmounted.
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div
-      className="p-2 shadow-lg border-slate-400 rounded-xl bg-yellow-200 w-[100px] h-[100px] transform transition-transform"
+      className="p-2 shadow-lg border-slate-400 rounded-xl bg-yellow-200 w-[100px] h-[100px] transform"
       style={{ transform: `translate(${xPosition}px, ${yPosition}px)` }}
       onMouseDown={handleMouseDown}
     >
