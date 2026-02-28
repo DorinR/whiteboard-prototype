@@ -7,7 +7,7 @@ export const Note = () => {
 
   return (
     <div
-      className={`border-2 border-amber-800 bg-amber-300 w-[100px] h-[100px] transform transition-transform`}
+      className={` p-2 shadow-lg border-slate-400 rounded-xl bg-yellow-200 w-[100px] h-[100px] transform transition-transform`}
       style={{ transform: `translate(${xPosition}px, ${yPosition}px)` }}
     >
       <div className="text-sm text-black">{noteContent}</div>
