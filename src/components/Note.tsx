@@ -1,10 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { BoardContext } from "./Board/BoardContext";
+import type { NoteState } from "../App";
 
-export const Note = () => {
-  const [noteContent] = useState<string>("Test note");
-  const [noteId] = useState<string>("001");
-  const [xPosition, setXposition] = useState<number>(500);
-  const [yPosition, setYPosition] = useState<number>(100);
+const useNoteState = (id: string) => {
+  const { notesStore, updateStore } = useContext(BoardContext);
+
+  const note = notesStore[id];
+
+  return { note, updateStore };
+};
+
+export const Note = ({ id }: { id: string }) => {
+  const { note, updateStore } = useNoteState(id);
 
   const dragRef = useRef<{ noteId: string; xOffset: number; yOffset: number }>(
     null,
@@ -22,12 +29,19 @@ export const Note = () => {
   }) => {
     const drag = dragRef.current;
     if (!drag) return;
+    if (!updateStore) return;
 
     const newX = clientX + drag.xOffset;
     const newY = clientY + drag.yOffset;
 
-    setXposition(newX);
-    setYPosition(newY);
+    updateStore({
+      type: "UPDATE_NOTE",
+      note: {
+        ...note,
+        xPosition: newX,
+        yPosition: newY,
+      },
+    });
   };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -35,9 +49,9 @@ export const Note = () => {
 
     // store which note was grabbed, and from where (offset)
     dragRef.current = {
-      noteId,
-      xOffset: xPosition - e.clientX,
-      yOffset: yPosition - e.clientY,
+      noteId: id,
+      xOffset: note.xPosition - e.clientX,
+      yOffset: note.yPosition - e.clientY,
     };
   };
 
@@ -77,13 +91,17 @@ export const Note = () => {
     };
   }, []);
 
+  if (!note) return null;
+
   return (
     <div
       className="p-2 shadow-lg border-slate-400 rounded-xl bg-yellow-200 w-[100px] h-[100px] transform"
-      style={{ transform: `translate(${xPosition}px, ${yPosition}px)` }}
+      style={{
+        transform: `translate(${note.xPosition}px, ${note.yPosition}px)`,
+      }}
       onMouseDown={handleMouseDown}
     >
-      <div className="text-sm text-black">{noteContent}</div>
+      <div className="text-sm text-black">{note.content}</div>
     </div>
   );
 };
