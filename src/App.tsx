@@ -1,7 +1,10 @@
-import "./App.css";
-import { BoardContext } from "./components/Board/BoardContext";
-import { Board } from "./components/Board/Board";
 import { useReducer } from "react";
+import "./App.css";
+import { Board } from "./components/Board/Board";
+import {
+  GlobalStoreContext,
+  NotesDispatchContext,
+} from "./components/Board/BoardContext";
 
 export type NoteState = {
   id: string;
@@ -9,6 +12,8 @@ export type NoteState = {
   xPosition: number;
   yPosition: number;
   zPosition: number;
+  width: number;
+  height: number;
 };
 
 export type NotesAction = {
@@ -39,9 +44,11 @@ function App() {
   const [state, dispatch] = useReducer(notesReducer, {});
 
   return (
-    <BoardContext.Provider value={{ notesStore: state, updateStore: dispatch }}>
-      <Board />
-    </BoardContext.Provider>
+    <NotesDispatchContext.Provider value={dispatch}>
+      <GlobalStoreContext.Provider value={state}>
+        <Board />
+      </GlobalStoreContext.Provider>
+    </NotesDispatchContext.Provider>
   );
 }
 

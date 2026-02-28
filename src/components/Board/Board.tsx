@@ -1,17 +1,20 @@
 import { useCallback, useContext } from "react";
-import { BoardContext } from "./BoardContext";
-import { Note } from "../Note";
+import { Note } from "../Note/Note";
+import { GlobalStoreContext, NotesDispatchContext } from "./BoardContext";
 
 const DEFAULT_X = 50;
 const DEFAULT_Y = 50;
 const DEFAULT_Z = 1;
+const DEFAULT_WIDTH = 120;
+const DEFAULT_HEIGHT = 120;
 
 export const Board = () => {
-  const { notesStore, updateStore } = useContext(BoardContext);
+  const notesStore = useContext(GlobalStoreContext);
+  const dispatch = useContext(NotesDispatchContext);
 
   const addNote = useCallback(() => {
-    if (!updateStore) return;
-    updateStore({
+    if (!dispatch) return;
+    dispatch({
       type: "ADD_NOTE",
       note: {
         id: crypto.randomUUID(),
@@ -19,9 +22,11 @@ export const Board = () => {
         xPosition: DEFAULT_X,
         yPosition: DEFAULT_Y,
         zPosition: DEFAULT_Z,
+        width: DEFAULT_WIDTH,
+        height: DEFAULT_HEIGHT,
       },
     });
-  }, [updateStore]);
+  }, [dispatch]);
 
   return (
     <div className="w-full h-full bg-slate-200 relative flex-col">
@@ -35,7 +40,7 @@ export const Board = () => {
       </div>
       <div>
         {Object.keys(notesStore).map((noteId) => {
-          return <Note key={noteId} id={noteId} />;
+          return <Note note={notesStore[noteId]} />;
         })}
       </div>
     </div>
