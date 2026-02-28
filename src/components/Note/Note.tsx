@@ -90,8 +90,6 @@ export const Note = memo(({ note }: { note: NoteState }) => {
     };
   }, []);
 
-  if (!note) return null;
-
   return (
     <div
       className="p-2 shadow-lg rounded-xl bg-yellow-200 transform text-black text-sm flex flex-col absolute"
