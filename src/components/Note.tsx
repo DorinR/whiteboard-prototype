@@ -1,6 +1,5 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { BoardContext } from "./Board/BoardContext";
-import type { NoteState } from "../App";
 
 const useNoteState = (id: string) => {
   const { notesStore, updateStore } = useContext(BoardContext);
