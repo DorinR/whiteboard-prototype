@@ -130,7 +130,7 @@ export const Note = memo(({ note }: { note: NoteState }) => {
     isHoveringDeleteLocalState,
   ]);
 
-  // cancel scheduled note position update if component is unmounted.
+  // cancel scheduled note position update if component is unmounted
   useEffect(() => {
     return () => {
       if (requestAnimationFrameRef.current !== null) {
