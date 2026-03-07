@@ -1,6 +1,7 @@
 import { useCallback, useContext } from "react";
 import { Note } from "../Note/Note";
 import { GlobalStoreContext, NotesDispatchContext } from "./BoardContext";
+import { DeleteArea } from "./DeleteArea";
 
 const DEFAULT_X = 50;
 const DEFAULT_Y = 50;
@@ -29,7 +30,7 @@ export const Board = () => {
   }, [dispatch]);
 
   return (
-    <div className="w-full h-full bg-slate-200 relative flex-col">
+    <div className="w-full h-full bg-slate-200 relative flex flex-col">
       <div className="p-2">
         <button
           onClick={addNote}
@@ -38,11 +39,12 @@ export const Board = () => {
           Add Note
         </button>
       </div>
-      <div>
+      <div className="grow">
         {Object.keys(notesStore).map((noteId) => {
-          return <Note note={notesStore[noteId]} />;
+          return <Note key={noteId} note={notesStore[noteId]} />;
         })}
       </div>
+      <DeleteArea />
     </div>
   );
 };
